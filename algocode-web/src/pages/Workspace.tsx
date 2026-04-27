@@ -6,6 +6,7 @@ import DOMPurify from 'dompurify';
 import Editor from '@monaco-editor/react';
 import { Play, Send, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import io, { Socket } from 'socket.io-client';
+import { useAuth } from '../contexts/AuthContext';
 
 import { problemServiceApi, submissionServiceApi } from '../lib/axios';
 import type { Problem } from './ProblemsList';
@@ -35,21 +36,21 @@ export default function Workspace() {
   
   const socketRef = useRef<Socket | null>(null);
   const [socketConnected, setSocketConnected] = useState(false);
-  // We'll hardcode a userId for demonstration
-  const userId = 'algo-student-1';
+  const { user } = useAuth();
+  const userId = user?.sub || 'anonymous';
 
   // Fetch Problem
   useEffect(() => {
     const fetchProblem = async () => {
       try {
         const res = await problemServiceApi.get(`/problems/${id}`);
-        setProblem(res.data.data);
-        if (res.data.data.codeStubs?.length > 0) {
-           const initialLang = res.data.data.codeStubs[0].language;
-           setLanguage(initialLang);
-           // NOTE: The submission service expects the user NOT to provide the start/end snippets
-           // However, for UX, we might show a template
-           setCode('// Write your code here...\n');
+        const problemData = res.data.data;
+        setProblem(problemData);
+        if (problemData.codeStubs?.length > 0) {
+           const initialStub = problemData.codeStubs[0];
+           setLanguage(initialStub.language);
+           // Use the actual code stub as the starting point
+           setCode(initialStub.userSnippet || '// Write your code here...\n');
         }
       } catch (err) {
         console.error('Failed to load problem', err);
@@ -84,10 +85,30 @@ export default function Workspace() {
     return () => {
       socket.disconnect();
     };
+  }, [userId]);
+
+  const [editorTheme, setEditorTheme] = useState('vs-dark');
+
+  useEffect(() => {
+    // Sync theme with document class
+    const checkTheme = () => {
+      setEditorTheme(document.documentElement.classList.contains('light-mode') ? 'light' : 'vs-dark');
+    };
+    checkTheme();
+    
+    // Simple observer for class changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
   }, []);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value);
+    const newLang = e.target.value;
+    setLanguage(newLang);
+    if (problem?.codeStubs) {
+      const stub = problem.codeStubs.find(s => s.language === newLang);
+      if (stub) setCode(stub.userSnippet || '');
+    }
   };
 
   const submitCode = async () => {
@@ -134,7 +155,7 @@ export default function Workspace() {
       </div>
 
       {/* Right Pane: Code + Console */}
-      <div className="w-1/2 h-full flex flex-col bg-[#1e1e1e]">
+      <div className="w-1/2 h-full flex flex-col bg-[var(--color-cc-bg)]">
         {/* Editor Toolbar */}
         <div className="h-12 bg-base-300 flex items-center justify-between px-4 shrink-0 text-sm border-b border-base-300">
           <div className="flex items-center gap-4">
@@ -178,7 +199,7 @@ export default function Workspace() {
           <Editor
             height="100%"
             language={language.toLowerCase() === 'cpp' ? 'cpp' : language.toLowerCase()}
-            theme="vs-dark"
+            theme={editorTheme}
             value={code}
             onChange={(val) => setCode(val || '')}
             options={{

@@ -8,7 +8,8 @@ function evaluationWorker(queue) {
         if (job.name === 'EvaluationJob') {
 
             try {
-                const response = await axios.post('http://localhost:3001/sendPayload', {
+                const socketServiceUrl = process.env.SOCKET_SERVICE_URL || 'http://localhost:3001';
+                const response = await axios.post(`${socketServiceUrl}/sendPayload`, {
                     userId: job.data.userId,
                     payload: job.data
                 })

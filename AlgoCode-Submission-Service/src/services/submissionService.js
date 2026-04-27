@@ -58,6 +58,11 @@ class SubmissionService {
         const submissions = await this.submissionRepository.getUserSubmissions(userId);
         return submissions;
     }
+
+    async getLeaderboard() {
+        const leaderboard = await this.submissionRepository.getLeaderboard();
+        return leaderboard;
+    }
 }
 
 module.exports = SubmissionService

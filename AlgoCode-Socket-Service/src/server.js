@@ -8,7 +8,7 @@ const app = express(); // Create express app
 app.use(bodyParser.json());
 const httpServer = createServer(app); // Create http server using express app
 
-const redisCache = new Redis(); // Create Redis client
+const redisCache = new Redis({ host: process.env.REDIS_HOST || '127.0.0.1', port: process.env.REDIS_PORT || 6379 }); // Create Redis client
 
 const io = new Server(httpServer, { 
     cors: {

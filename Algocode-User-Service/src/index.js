@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/dbConfig');
 const { connectRedis } = require('./config/redisConfig');
 const authRoutes = require('./routes/authRoutes');
+const profileRoutes = require('./routes/profileRoutes');
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/v1/user/auth', authRoutes);
+app.use('/api/v1/user/profile', profileRoutes);
 
 // Database & Redis Connections
 const startServer = async () => {

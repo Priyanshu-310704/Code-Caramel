@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { problemServiceApi } from '../lib/axios';
+import { useAuth } from '../contexts/AuthContext';
 
 export interface Problem {
   _id: string;
@@ -13,6 +14,8 @@ export default function ProblemsList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submissions, setSubmissions] = useState<Record<string, boolean>>({});
+  const { user } = useAuth();
+
   useEffect(() => {
     const fetchProblems = async () => {
       try {
@@ -27,8 +30,9 @@ export default function ProblemsList() {
     };
 
     const fetchSubmissions = async () => {
+      if (!user?.sub) return;
       try {
-        const res = await problemServiceApi.get('http://localhost:3002/api/v1/submissions/user/algo-student-1');
+        const res = await problemServiceApi.get(`http://localhost:3002/api/v1/submissions/user/${user.sub}`);
         const userSubmissions = res.data.data || [];
         const completed: Record<string, boolean> = {};
         userSubmissions.forEach((sub: any) => {
@@ -43,8 +47,10 @@ export default function ProblemsList() {
     };
 
     fetchProblems();
-    fetchSubmissions();
-  }, []);
+    if (user) {
+      fetchSubmissions();
+    }
+  }, [user]);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {

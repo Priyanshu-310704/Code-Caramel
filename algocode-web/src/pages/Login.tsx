@@ -10,8 +10,6 @@ export default function Login() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [otp, setOtp] = useState('');
-    const [step, setStep] = useState<'LOGIN' | 'OTP'>('LOGIN');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -20,27 +18,13 @@ export default function Login() {
         setIsLoading(true);
         setError('');
         try {
-            await axios.post('http://localhost:3004/api/v1/user/auth/login', { email, password });
-            setStep('OTP');
-        } catch (err: any) {
-            setError(err?.response?.data?.error || 'Invalid email or password.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleVerifyOtp = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setError('');
-        try {
-            const res = await axios.post('http://localhost:3004/api/v1/user/auth/verify-otp', { email, otp });
+            const res = await axios.post('http://localhost:3004/api/v1/user/auth/login', { email, password });
             if (res.data.token) {
                 login(res.data.token);
                 navigate('/');
             }
         } catch (err: any) {
-            setError(err?.response?.data?.error || 'Invalid OTP.');
+            setError(err?.response?.data?.error || 'Invalid email or password.');
         } finally {
             setIsLoading(false);
         }
@@ -60,65 +44,37 @@ export default function Login() {
                     </div>
                 )}
 
-                {step === 'LOGIN' ? (
-                    <form onSubmit={handleLogin} className="w-full space-y-4 mb-4">
-                        <div className="form-control w-full">
-                            <label className="label"><span className="label-text font-semibold text-[var(--color-cc-text)]">Email Address</span></label>
-                            <input
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="input input-bordered w-full bg-[var(--color-cc-card)] border-[var(--color-cc-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-cc-primary)]"
-                                placeholder="you@example.com"
-                            />
-                        </div>
-                        <div className="form-control w-full">
-                            <label className="label"><span className="label-text font-semibold text-[var(--color-cc-text)]">Password</span></label>
-                            <input
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="input input-bordered w-full bg-[var(--color-cc-card)] border-[var(--color-cc-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-cc-primary)]"
-                                placeholder="••••••••"
-                            />
-                        </div>
-                        <button type="submit" disabled={isLoading} className="btn w-full bg-[var(--color-cc-primary)] hover:bg-[var(--color-cc-primary)]/90 text-[var(--color-cc-bg)] border-none shrink-0 cursor-pointer text-lg h-12 mt-2">
-                            {isLoading ? <span className="loading loading-spinner text-white"></span> : 'Log In'}
-                        </button>
-                    </form>
-                ) : (
-                    <form onSubmit={handleVerifyOtp} className="w-full space-y-4 mb-4">
-                        <div className="form-control w-full">
-                            <label className="label">
-                                <span className="label-text font-semibold text-[var(--color-cc-text)]">Enter 2FA OTP</span>
-                            </label>
-                            <input
-                                type="text"
-                                required
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                                className="input input-bordered w-full bg-[var(--color-cc-card)] border-[var(--color-cc-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-cc-primary)] tracking-widest text-center text-2xl font-mono h-14"
-                                placeholder="000000"
-                                maxLength={6}
-                            />
-                            <label className="label mt-1">
-                                <span className="label-text-alt text-[var(--color-cc-text-muted)] text-sm">Sent to {email}</span>
-                                <span className="label-text-alt text-[var(--color-cc-primary)] cursor-pointer hover:underline text-sm font-semibold" onClick={() => setStep('LOGIN')}>Cancel</span>
-                            </label>
-                        </div>
-                        <button type="submit" disabled={isLoading} className="btn w-full bg-[var(--color-cc-primary)] hover:bg-[var(--color-cc-primary)]/90 text-white border-none text-lg h-12">
-                            {isLoading ? <span className="loading loading-spinner text-white"></span> : 'Verify & Login'}
-                        </button>
-                    </form>
-                )}
+                <form onSubmit={handleLogin} className="w-full space-y-4 mb-4">
+                    <div className="form-control w-full">
+                        <label className="label"><span className="label-text font-semibold text-[var(--color-cc-text)]">Email Address</span></label>
+                        <input
+                            type="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="input input-bordered w-full bg-[var(--color-cc-card)] border-[var(--color-cc-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-cc-primary)]"
+                            placeholder="you@example.com"
+                        />
+                    </div>
+                    <div className="form-control w-full">
+                        <label className="label"><span className="label-text font-semibold text-[var(--color-cc-text)]">Password</span></label>
+                        <input
+                            type="password"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="input input-bordered w-full bg-[var(--color-cc-card)] border-[var(--color-cc-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-cc-primary)]"
+                            placeholder="••••••••"
+                        />
+                    </div>
+                    <button type="submit" disabled={isLoading} className="btn w-full bg-[var(--color-cc-primary)] hover:bg-[var(--color-cc-primary)]/90 text-[var(--color-cc-bg)] border-none shrink-0 cursor-pointer text-lg h-12 mt-2">
+                        {isLoading ? <span className="loading loading-spinner text-white"></span> : 'Log In'}
+                    </button>
+                </form>
 
-                {step === 'LOGIN' && (
-                    <p className="text-[var(--color-cc-text-muted)] text-sm mb-4">
-                        Don't have an account? <Link to="/register" className="text-[var(--color-cc-primary)] font-semibold hover:underline">Sign Up</Link>
-                    </p>
-                )}
+                <p className="text-[var(--color-cc-text-muted)] text-sm mb-4">
+                    Don't have an account? <Link to="/register" className="text-[var(--color-cc-primary)] font-semibold hover:underline">Sign Up</Link>
+                </p>
 
                 <div className="divider text-[var(--color-cc-text-muted)] font-medium before:bg-[var(--color-cc-border)] after:bg-[var(--color-cc-border)] w-full mb-6">OR</div>
 

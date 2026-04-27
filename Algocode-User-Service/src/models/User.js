@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema({
     picture: {
         type: String,
         default: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'
+    },
+    gender: {
+        type: String,
+        enum: ['Male', 'Female', 'Prefer not to say', 'Other'],
+        default: 'Prefer not to say'
     }
 }, { timestamps: true });
 

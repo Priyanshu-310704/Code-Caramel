@@ -44,18 +44,18 @@ exports.login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ error: 'Invalid email or password' });
 
-        // Password matches, send OTP
-        const otp = generateOTP();
-        
-        // Save OTP to Redis with 5 mins expiration
-        await redisClient.setEx(`otp:${email}`, 300, otp);
-        
-        const isSent = await sendOTP(email, otp);
-        if (!isSent) {
-            return res.status(500).json({ error: 'Failed to send OTP email' });
-        }
+        // Password matches, skip OTP and login directly
+        const payload = {
+            sub: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            picture: user.picture,
+            gender: user.gender
+        };
 
-        return res.status(200).json({ message: 'OTP sent successfully. Please verify to complete login.' });
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        return res.status(200).json({ message: 'Login successful', token, user: payload });
     } catch (error) {
         console.error('Login Error:', error);
         return res.status(500).json({ error: 'Internal server error' });
@@ -107,7 +107,8 @@ exports.verifyOtp = async (req, res) => {
             sub: user._id.toString(),
             name: user.name,
             email: user.email,
-            picture: user.picture
+            picture: user.picture,
+            gender: user.gender
         };
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });

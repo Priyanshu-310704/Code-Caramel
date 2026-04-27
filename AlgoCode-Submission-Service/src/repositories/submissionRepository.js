@@ -16,6 +16,17 @@ class SubmissionRepository {
         return response;
     }
 
+    async getLeaderboard() {
+        const response = await this.submissionModel.aggregate([
+            { $match: { status: 'Success' } },
+            { $group: { _id: "$userId", problemsSolved: { $addToSet: "$problemId" } } },
+            { $project: { userId: "$_id", _id: 0, score: { $size: "$problemsSolved" } } },
+            { $sort: { score: -1 } },
+            { $limit: 100 }
+        ]);
+        return response;
+    }
+
     async updateSubmissionStatus(submissionId, status) {
         const response = await this.submissionModel.findByIdAndUpdate(submissionId, { status }, { new: true });
         return response;

@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    command: ["redis-server", "--maxmemory", "100mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+
+  socket-service:
+    build:
+      context: ./AlgoCode-Socket-Service
+    ports:
+      - "3001:3001"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - ./AlgoCode-Socket-Service/.env
+    deploy:
+      resources:
+        limits:
+          memory: 150M
+
+  submission-service:
+    build:
+      context: ./AlgoCode-Submission-Service
+    ports:
+      - "3002:3002"
+    environment:
+      - RUN_WORKER_ONLY=false
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SOCKET_SERVICE_URL=http://socket-service:3001
+    env_file:
+      - ./AlgoCode-Submission-Service/.env
+    deploy:
+      resources:
+        limits:
+          memory: 150M
+
+  submission-worker:
+    build:
+      context: ./AlgoCode-Submission-Service
+    environment:
+      - RUN_WORKER_ONLY=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SOCKET_SERVICE_URL=http://socket-service:3001
+    env_file:
+      - ./AlgoCode-Submission-Service/.env
+    deploy:
+      resources:
+        limits:
+          memory: 150M
+
+  evaluator-service:
+    build:
+      context: ./Algocode-Evaluator-Service
+    ports:
+      - "3000:3000"
+    environment:
+      - RUN_WORKER_ONLY=false
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - ./Algocode-Evaluator-Service/.env
+    deploy:
+      resources:
+        limits:
+          memory: 150M
+
+  evaluator-worker:
+    build:
+      context: ./Algocode-Evaluator-Service
+    environment:
+      - RUN_WORKER_ONLY=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - ./Algocode-Evaluator-Service/.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      resources:
+        limits:
+          memory: 150M
+
+  problem-service:
+    build:
+      context: ./Algocode-Problem-Service
+    ports:
+      - "3003:3003"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - ./Algocode-Problem-Service/.env
+    deploy:
+      resources:
+        limits:
+          memory: 150M
+
+  user-service:
+    build:
+      context: ./Algocode-User-Service
+    ports:
+      - "3004:3004"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - ./Algocode-User-Service/.env
+    deploy:
+      resources:
+        limits:
+          memory: 150M

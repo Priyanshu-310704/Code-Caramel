@@ -19,11 +19,11 @@ if ($dangling) {
 }
 
 # Show free ports
-Write-Host "Verifying ports 3000-3003 and 5500 are free..." -ForegroundColor Yellow
-$busy = netstat -ano | Select-String ":(300[0-3]|5500)\s.*LISTENING"
+Write-Host "Verifying ports 3000-3004 and 5500 are free..." -ForegroundColor Yellow
+$busy = netstat -ano | Select-String ":(300[0-4]|5500)\s.*LISTENING"
 if ($busy) {
     Write-Host "Warning - some ports still in use:" -ForegroundColor Red
     $busy
 } else {
-    Write-Host "All ports 3000-3003, and 5500 are fully decommissioned. System resources restored!" -ForegroundColor Green
+    Write-Host "All ports 3000-3004, and 5500 are fully decommissioned. System resources restored!" -ForegroundColor Green
 }

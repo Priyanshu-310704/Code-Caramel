@@ -45,6 +45,18 @@ export default function Navbar() {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--color-cc-primary)] transition-all group-hover:w-full"></span>
             </Link>
           </li>
+          <li>
+            <Link to="/architecture" className="hover:text-purple-400 text-purple-300 transition-colors relative group whitespace-nowrap">
+              Architecture
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all group-hover:w-full"></span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/leaderboard" className="hover:text-yellow-400 text-yellow-300 transition-colors relative group whitespace-nowrap flex items-center gap-1">
+              Leaderboard
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-400 transition-all group-hover:w-full"></span>
+            </Link>
+          </li>
         </ul>
 
         {/* Theme Toggle Button */}
@@ -69,7 +81,10 @@ export default function Navbar() {
                 {user.name}
               </li>
               <li>
-                <button onClick={logout} className="text-red-500 hover:text-red-400 mt-1">Logout</button>
+                <Link to="/profile" onClick={() => (document.activeElement as HTMLElement)?.blur()} className="hover:text-[var(--color-cc-primary)] mt-1 font-medium">Profile</Link>
+              </li>
+              <li>
+                <button onClick={() => { logout(); (document.activeElement as HTMLElement)?.blur(); }} className="text-red-500 hover:text-red-400 mt-1 font-medium">Logout</button>
               </li>
             </ul>
           </div>

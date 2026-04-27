@@ -37,8 +37,27 @@ async function getUserSubmissions(req, res) {
     }
 }
 
+async function getLeaderboard(req, res) {
+    try {
+        const response = await this.submissionService.getLeaderboard();
+        return res.status(200).send({
+            error: {},
+            data: response,
+            success: true,
+            message: 'Fetched leaderboard successfully'
+        });
+    } catch(error) {
+        return res.status(500).send({
+            error: error.message,
+            success: false,
+            message: 'Failed to fetch leaderboard'
+        });
+    }
+}
+
 module.exports =  {
     pingRequest,
     createSubmission,
-    getUserSubmissions
+    getUserSubmissions,
+    getLeaderboard
 };

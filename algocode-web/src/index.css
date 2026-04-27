@@ -28,11 +28,11 @@
 }
 
 html.light-mode {
-  --color-cc-bg: #fafafa;
-  --color-cc-card: rgba(0, 0, 0, 0.03);
-  --color-cc-border: rgba(0, 0, 0, 0.1);
-  --color-cc-text: #18181b; /* zinc-900 */
-  --color-cc-text-muted: #52525b; /* zinc-600 */
+  --color-cc-bg: #ffffff;
+  --color-cc-card: rgba(0, 0, 0, 0.05);
+  --color-cc-border: rgba(0, 0, 0, 0.15);
+  --color-cc-text: #09090b; /* zinc-950 */
+  --color-cc-text-muted: #3f3f46; /* zinc-700 */
 }
 
 @layer base {

@@ -8,13 +8,18 @@ const evaluationWorker = require('./workers/evaluationWorker');
 fastify.register(app);
 fastify.setErrorHandler(errorHandler);
 
-fastify.listen({ port: serverConfig.PORT }, async (err) => {
-    if (err) {
-      fastify.log.error(err);
-      process.exit(1)
-    }
-    await connectToDB();
-
-    evaluationWorker("EvaluationQueue");
-    console.log(`Server up at port ${serverConfig.PORT}`);
-});
+if (process.env.RUN_WORKER_ONLY === 'true') {
+    connectToDB().then(() => {
+        evaluationWorker("EvaluationQueue");
+        console.log("Worker started successfully");
+    });
+} else {
+    fastify.listen({ port: serverConfig.PORT, host: '0.0.0.0' }, async (err) => {
+        if (err) {
+            fastify.log.error(err);
+            process.exit(1)
+        }
+        await connectToDB();
+        console.log(`Server up at port ${serverConfig.PORT}`);
+    });
+}

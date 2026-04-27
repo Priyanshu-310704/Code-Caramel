@@ -7,6 +7,9 @@ import AddProblem from './pages/AddProblem'
 import Sheets from './pages/Sheets'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Profile from './pages/Profile'
+import Architecture from './pages/Architecture'
+import Leaderboard from './pages/Leaderboard'
 
 function App() {
   return (
@@ -17,6 +20,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/architecture" element={<Architecture />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/problems" element={<ProblemsList />} />
           <Route path="/problems/:id" element={<Workspace />} />
           <Route path="/add-problem" element={<AddProblem />} />
