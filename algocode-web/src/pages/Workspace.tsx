@@ -15,6 +15,7 @@ interface CodeStub {
   language: string;
   startSnippet: string;
   endSnippet: string;
+  userSnippet?: string;
 }
 
 interface ProblemDetail extends Problem {

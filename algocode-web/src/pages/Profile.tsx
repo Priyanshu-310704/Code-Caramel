@@ -4,7 +4,7 @@ import { UserCircle, Mail, User as UserIcon, ShieldCheck } from 'lucide-react';
 import axios from 'axios';
 
 export default function Profile() {
-    const { user, login } = useAuth();
+    const { user } = useAuth();
     
     const [name, setName] = useState(user?.name || '');
     const [gender, setGender] = useState(user?.gender || 'Prefer not to say');
@@ -42,7 +42,7 @@ export default function Profile() {
 
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.put('http://localhost:3004/api/v1/user/profile', 
+            await axios.put('http://localhost:3004/api/v1/user/profile',
                 { name, gender },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
